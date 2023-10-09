@@ -1,0 +1,33 @@
+name: Windows
+on: workflow_dispatch
+jobs:
+  build:
+    permissions:
+      contents: write
+    runs-on: windows-2022
+    steps:
+      - name: Checkout vigemclient
+        uses: actions/checkout@v4
+        with:
+          repository: nefarius/ViGEmClient
+          path: vigemclient
+      - name: Init MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+      - name: Build vigemclient
+        run: |
+          cd vigemclient
+          mkdir build
+          cd build
+          cmake .. -DViGEmClient_DLL=ON
+          cmake --build . --config Debug
+          cmake --install . --config Debug --prefix install/Debug
+          cmake --build . --config Release
+          cmake --install . --config Release --prefix install/Release
+      - name: Generate zip
+        run: |
+          echo ${{ github.sha }} > Release.txt
+          Compress-Archive -Path ./vigemclient/build/install/*,./Release.txt -DestinationPath vigemclient.zip
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: vigemclient.zip
