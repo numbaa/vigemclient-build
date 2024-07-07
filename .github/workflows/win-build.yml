@@ -18,7 +18,7 @@ jobs:
           cd vigemclient
           mkdir build
           cd build
-          cmake .. -DViGEmClient_DLL=ON
+          cmake ..
           cmake --build . --config Debug
           cmake --install . --config Debug --prefix install/Debug
           cmake --build . --config Release
